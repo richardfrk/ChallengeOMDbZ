@@ -35,9 +35,7 @@ class MyMoviesTableViewController: UITableViewController {
         super.viewDidLoad()
         
         self.navigationItem.leftBarButtonItem = editTableViewButton
-        
         fetchDataFromPersistence()
-    
     }
     
     @objc private func editTableViewAction() {
@@ -45,13 +43,9 @@ class MyMoviesTableViewController: UITableViewController {
         if !tableView.isEditing {
             
             tableView.setEditing(true, animated: true)
-        
         } else {
-        
             tableView.setEditing(false, animated: true)
-
         }
-        
     }
     
     private func fetchDataFromPersistence() {
@@ -127,8 +121,8 @@ class MyMoviesTableViewController: UITableViewController {
 extension MyMoviesTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView.beginUpdates()
         
+        tableView.beginUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -156,6 +150,7 @@ extension MyMoviesTableViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        
         tableView.endUpdates()
     }
     

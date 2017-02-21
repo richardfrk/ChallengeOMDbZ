@@ -24,10 +24,9 @@ class SearchTableViewController: UITableViewController {
         search.delegate = self
         search.placeholder = "Search"
         self.navigationItem.titleView = search
-
     }
     
-    func searchFetch(_ string: String) {
+    func searchMovieFetchData(_ string: String) {
         
         OMDbAPI.fetchDataFromSearchByTitle(string) { (data) in
             self.dataSource = data
@@ -35,6 +34,7 @@ class SearchTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         return dataSource.count
     }
     
@@ -58,13 +58,12 @@ class SearchTableViewController: UITableViewController {
         
         if segue.identifier == "SearchSegue" {
             
-            if let myViewController = segue.destination as? MovieTableViewController {
-                
-                if let myIndePath = tableView.indexPathForSelectedRow {
-                    
-                    myViewController.segueData = dataSource[myIndePath.row].mmIMDbID!
-                }
-            }
+            guard let myViewController = segue.destination as? MovieTableViewController else { return }
+        
+            guard let myIndePath = tableView.indexPathForSelectedRow else
+                { return }
+            
+            myViewController.segueData = dataSource[myIndePath.row].mmIMDbID!
         }
     }
 }
@@ -74,8 +73,7 @@ extension SearchTableViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         if let myString = searchBar.text {
-            searchFetch(myString)
-            //searchBar.isUserInteractionEnabled = false
+            searchMovieFetchData(myString)
         }
     }
 }
