@@ -28,7 +28,7 @@ class MovieTableViewController: UITableViewController {
     @IBOutlet weak var movieRatedCell: UITableViewCell!
     @IBOutlet weak var movieGenreCell: UITableViewCell!
     
-    var segueData: String!
+    var segueData: String?
     var posterView: UIImageView!
     
     var addMovieButton: UIBarButtonItem {
@@ -44,39 +44,47 @@ class MovieTableViewController: UITableViewController {
         
         self.navigationItem.rightBarButtonItem = addMovieButton
         feedMovieTableView()
+        
     }
     
     private func feedMovieTableView() {
         
-        var searchResult = [MovieEntity]()
-        
-        let requestMovieEntity: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
-        let predicateMovieEntity = NSPredicate(format: "mmIMDbID = %@", segueData!)
-        requestMovieEntity.predicate = predicateMovieEntity
-        
-        do {
-            searchResult = try myContext.fetch(requestMovieEntity)
-        } catch {
-            print(error)
-        }
-                
-        if !searchResult.isEmpty {
+        if let segueData = segueData {
             
-            for result in searchResult {
-                configureCell(object: result)
-                self.navigationItem.rightBarButtonItems = [delMovieButton]
+            var searchResult = [MovieEntity]()
+            
+            let requestMovieEntity: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
+            let predicateMovieEntity = NSPredicate(format: "mmIMDbID = %@", segueData)
+            requestMovieEntity.predicate = predicateMovieEntity
+            
+            do {
+                searchResult = try myContext.fetch(requestMovieEntity)
+            } catch {
+                print(error)
             }
             
-        } else {
-    
-            OMDbAPI.fetchDataMovieByIMDbID(segueData, completionHandler: { (data) in
+            if !searchResult.isEmpty {
                 
-                self.currentMovieEntity = data
-                self.configureCell(object: data)
-                self.addMovieButton.isEnabled = false
-
-            })
+                for result in searchResult {
+                    configureCell(object: result)
+                    self.navigationItem.rightBarButtonItems = [delMovieButton]
+                }
+                
+            } else {
+                
+                OMDbAPI.fetchDataMovieByIMDbID(segueData, completionHandler: { (data) in
+                    
+                    self.currentMovieEntity = data
+                    self.configureCell(object: data)
+                    self.addMovieButton.isEnabled = false
+                    
+                })
+            }
+        } else {
+         
+            print("Invalid Segue Data.")
         }
+        
     }
     
     private func configureCell(object: MovieEntity) {
@@ -130,12 +138,12 @@ class MovieTableViewController: UITableViewController {
         
         self.navigationItem.rightBarButtonItems = [addMovieButton]
         
-        if let currentMovieEntity = currentMovieEntity {
+        if let segueData = segueData {
             
             var searchResult = [MovieEntity]()
             
             let requestMovieEntity: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
-            let predicateMovieEntity = NSPredicate(format: "mmIMDbID = %@", currentMovieEntity.mmIMDbID!)
+            let predicateMovieEntity = NSPredicate(format: "mmIMDbID = %@", segueData)
             requestMovieEntity.predicate = predicateMovieEntity
             
             do {
@@ -158,7 +166,7 @@ class MovieTableViewController: UITableViewController {
             
         } else {
             
-            print("Invalid Data.")
+            print("Invalid Segue Data.")
         }
     }
 }
