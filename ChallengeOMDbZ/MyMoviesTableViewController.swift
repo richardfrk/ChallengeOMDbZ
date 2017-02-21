@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Kingfisher
 
 class MyMoviesTableViewController: UITableViewController {
     
@@ -82,12 +83,9 @@ class MyMoviesTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyCustomCell", for: indexPath) as! MyMoviesTableViewCell
         
         cell.myMoviesTitleLabel.text = dataSource[indexPath.row].mmTitle
-        
-        if let imageData = dataSource[indexPath.row].mmPoster as? Data {
-            cell.myMoviesImagePoster.image = UIImage(data: imageData)
-        } else {
-            cell.myMoviesImagePoster.image = nil
-        }
+        cell.myMoviesYearLabel.text = dataSource[indexPath.row].mmYear
+        cell.myMoviesGenreLabel.text = dataSource[indexPath.row].mmGenre
+        cell.myMoviesImagePoster.kf.setImage(with: URL(string: dataSource[indexPath.row].mmPoster!))
         
         return cell
     }

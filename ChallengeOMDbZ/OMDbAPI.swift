@@ -52,7 +52,7 @@ class OMDbAPI {
         
         Alamofire.request("https://www.omdbapi.com/", parameters: myParameters).validate(statusCode: 200..<300).responseJSON{ response in
             
-            print(response.request!)
+            //print(response.request!)
             
             switch response.result {
                 

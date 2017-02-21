@@ -21,6 +21,8 @@ class MovieTableViewController: UITableViewController {
     @IBOutlet weak var moviePosterCell: UITableViewCell!
     @IBOutlet weak var moviePlotCell: UITableViewCell!
     
+    @IBOutlet weak var movieYearCell: UITableViewCell!
+    
     @IBOutlet weak var movieReleasedCell: UITableViewCell!
     @IBOutlet weak var movieRuntimeCell: UITableViewCell!
     @IBOutlet weak var movieRatedCell: UITableViewCell!
@@ -57,9 +59,7 @@ class MovieTableViewController: UITableViewController {
         } catch {
             print(error)
         }
-        
-        print(searchResult)
-        
+                
         if !searchResult.isEmpty {
             
             for result in searchResult {
@@ -80,24 +80,24 @@ class MovieTableViewController: UITableViewController {
     }
     
     private func configureCell(object: MovieEntity) {
+        
+        self.posterView = UIImageView()
+        self.posterView.kf.setImage(with: URL(string: object.mmPoster!))
+        self.posterView.contentMode = UIViewContentMode.scaleAspectFill
+        self.moviePosterCell.backgroundView = self.posterView
+
     
         DispatchQueue.main.async {
         
-            self.title = object.mmType
-                        
+            self.title = object.mmTitle
             self.moviePlotCell.textLabel?.text = object.mmPlot
+            self.movieYearCell.detailTextLabel?.text = object.mmYear
             self.movieReleasedCell.detailTextLabel?.text = object.mmReleased
             self.movieRuntimeCell.detailTextLabel?.text = object.mmRuntime
             self.movieRatedCell.detailTextLabel?.text = object.mmRated
             self.movieGenreCell.detailTextLabel?.text = object.mmGenre
         
         }
-        
-        self.posterView = UIImageView()
-        self.posterView.kf.setImage(with: URL(string: object.mmPoster!))
-        self.posterView.contentMode = UIViewContentMode.scaleAspectFill
-        self.moviePosterCell.backgroundView = self.posterView
-        
     }
     
     @objc private func addMovieAction() {
@@ -109,8 +109,13 @@ class MovieTableViewController: UITableViewController {
         myMovieEntity.mmTitle = currentMovieEntity?.mmTitle
         myMovieEntity.mmYear = currentMovieEntity?.mmYear
         myMovieEntity.mmIMDbID = currentMovieEntity?.mmIMDbID
-        myMovieEntity.mmType = currentMovieEntity?.mmType
-        
+        myMovieEntity.mmPlot = currentMovieEntity?.mmPlot
+        myMovieEntity.mmGenre = currentMovieEntity?.mmGenre
+        myMovieEntity.mmReleased = currentMovieEntity?.mmReleased
+        myMovieEntity.mmRuntime = currentMovieEntity?.mmRuntime
+        myMovieEntity.mmRated = currentMovieEntity?.mmRated
+        myMovieEntity.mmPoster = currentMovieEntity?.mmPoster
+    
         do {
             
             try myContext.save()
