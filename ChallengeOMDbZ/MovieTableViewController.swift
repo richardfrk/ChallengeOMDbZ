@@ -123,12 +123,16 @@ class MovieTableViewController: UITableViewController {
         
             self.title = object.mmTitle
             self.moviePlotCell.textLabel?.text = object.mmPlot
+            self.movieYearCell.textLabel?.text = "Year"
             self.movieYearCell.detailTextLabel?.text = object.mmYear
+            self.movieReleasedCell.textLabel?.text = "Released"
             self.movieReleasedCell.detailTextLabel?.text = object.mmReleased
+            self.movieRuntimeCell.textLabel?.text = "Runtime"
             self.movieRuntimeCell.detailTextLabel?.text = object.mmRuntime
+            self.movieRatedCell.textLabel?.text = "Rated"
             self.movieRatedCell.detailTextLabel?.text = object.mmRated
+            self.movieGenreCell.textLabel?.text = "Genre"
             self.movieGenreCell.detailTextLabel?.text = object.mmGenre
-        
         }
     }
     
