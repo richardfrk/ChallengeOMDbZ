@@ -10,6 +10,12 @@ import UIKit
 import Kingfisher
 import CoreData
 
+enum CoreDataAction {
+    
+    case delete
+    case populate
+}
+
 class MovieTableViewController: UITableViewController {
     
     var myContext: NSManagedObjectContext {
@@ -20,9 +26,7 @@ class MovieTableViewController: UITableViewController {
     
     @IBOutlet weak var moviePosterCell: UITableViewCell!
     @IBOutlet weak var moviePlotCell: UITableViewCell!
-    
     @IBOutlet weak var movieYearCell: UITableViewCell!
-    
     @IBOutlet weak var movieReleasedCell: UITableViewCell!
     @IBOutlet weak var movieRuntimeCell: UITableViewCell!
     @IBOutlet weak var movieRatedCell: UITableViewCell!
@@ -43,11 +47,11 @@ class MovieTableViewController: UITableViewController {
         super.viewDidLoad()
         
         self.navigationItem.rightBarButtonItem = addMovieButton
-        feedMovieTableView()
+        performCoreData(segueData: segueData, action: .populate)
         
     }
     
-    private func feedMovieTableView() {
+    private func performCoreData(segueData: String?, action: CoreDataAction) {
         
         if let segueData = segueData {
             
@@ -60,28 +64,48 @@ class MovieTableViewController: UITableViewController {
             do {
                 searchResult = try myContext.fetch(requestMovieEntity)
             } catch {
+                
                 print(error)
             }
             
-            if !searchResult.isEmpty {
+            switch action {
+            
+            case .populate:
                 
-                for result in searchResult {
-                    configureCell(object: result)
-                    self.navigationItem.rightBarButtonItems = [delMovieButton]
+                if !searchResult.isEmpty {
+                    
+                    for result in searchResult {
+                        configureCell(object: result)
+                        self.navigationItem.rightBarButtonItems = [delMovieButton]
+                    }
+                    
+                } else {
+                    
+                    OMDbAPI.fetchDataMovieByIMDbID(segueData, completionHandler: { (data) in
+                        
+                        self.currentMovieEntity = data
+                        self.configureCell(object: data)
+                        self.addMovieButton.isEnabled = false
+                        
+                    })
                 }
                 
-            } else {
+            case .delete:
                 
-                OMDbAPI.fetchDataMovieByIMDbID(segueData, completionHandler: { (data) in
+                for result in searchResult {
                     
-                    self.currentMovieEntity = data
-                    self.configureCell(object: data)
-                    self.addMovieButton.isEnabled = false
-                    
-                })
+                    myContext.delete(result)
+                }
+                
+                do {
+                    try myContext.save()
+                } catch {
+                    print(error)
+                }
             }
+            
         } else {
-         
+            
             print("Invalid Segue Data.")
         }
         
@@ -137,36 +161,6 @@ class MovieTableViewController: UITableViewController {
     @objc private func delMovieAction() {
         
         self.navigationItem.rightBarButtonItems = [addMovieButton]
-        
-        if let segueData = segueData {
-            
-            var searchResult = [MovieEntity]()
-            
-            let requestMovieEntity: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
-            let predicateMovieEntity = NSPredicate(format: "mmIMDbID = %@", segueData)
-            requestMovieEntity.predicate = predicateMovieEntity
-            
-            do {
-                searchResult = try myContext.fetch(requestMovieEntity)
-            } catch {
-                
-                print(error)
-            }
-            
-            for result in searchResult {
-                
-                myContext.delete(result)
-            }
-            
-            do {
-                try myContext.save()
-            } catch {
-                print(error)
-            }
-            
-        } else {
-            
-            print("Invalid Segue Data.")
-        }
+        performCoreData(segueData: segueData, action: .delete)
     }
 }
